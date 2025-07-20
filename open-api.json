@@ -1,0 +1,401 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "WildDuck API",
+    "version": "1.0.0",
+    "description": "Complete REST API for WildDuck Mail Server"
+  },
+  "host": "your-wildduck-server.com",
+  "basePath": "/api",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [{"BearerAuth": []}],
+  "paths": {
+    // Authentication
+    "/authenticate": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Get access token",
+        "parameters": [{
+          "name": "credentials",
+          "in": "body",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/AuthRequest"
+          }
+        }],
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "schema": {
+              "$ref": "#/definitions/AuthResponse"
+            }
+          }
+        }
+      }
+    },
+
+    // Users
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "List all users",
+        "parameters": [
+          {"$ref": "#/parameters/limitParam"},
+          {"$ref": "#/parameters/pageParam"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/UserList"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create new user",
+        "parameters": [{
+          "name": "user",
+          "in": "body",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/UserCreate"
+          }
+        }],
+        "responses": {
+          "201": {
+            "description": "User created",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      }
+    },
+
+    "/users/{user}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get user details",
+        "parameters": [{
+          "$ref": "#/parameters/userIdParam"
+        }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update user",
+        "parameters": [
+          {"$ref": "#/parameters/userIdParam"},
+          {
+            "name": "updates",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete user",
+        "parameters": [{"$ref": "#/parameters/userIdParam"}],
+        "responses": {
+          "204": {
+            "description": "User deleted"
+          }
+        }
+      }
+    },
+
+    // Mailboxes
+    "/users/{user}/mailboxes": {
+      "get": {
+        "tags": ["Mailboxes"],
+        "summary": "List user mailboxes",
+        "parameters": [{"$ref": "#/parameters/userIdParam"}],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Mailbox"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Mailboxes"],
+        "summary": "Create mailbox",
+        "parameters": [
+          {"$ref": "#/parameters/userIdParam"},
+          {
+            "name": "mailbox",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MailboxCreate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Mailbox created",
+            "schema": {
+              "$ref": "#/definitions/Mailbox"
+            }
+          }
+        }
+      }
+    },
+
+    "/users/{user}/mailboxes/{mailbox}": {
+      "get": {
+        "tags": ["Mailboxes"],
+        "summary": "Get mailbox info",
+        "parameters": [
+          {"$ref": "#/parameters/userIdParam"},
+          {"$ref": "#/parameters/mailboxIdParam"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Mailbox"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Mailboxes"],
+        "summary": "Update mailbox",
+        "parameters": [
+          {"$ref": "#/parameters/userIdParam"},
+          {"$ref": "#/parameters/mailboxIdParam"},
+          {
+            "name": "updates",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MailboxUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mailbox updated",
+            "schema": {
+              "$ref": "#/definitions/Mailbox"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Mailboxes"],
+        "summary": "Delete mailbox",
+        "parameters": [
+          {"$ref": "#/parameters/userIdParam"},
+          {"$ref": "#/parameters/mailboxIdParam"}
+        ],
+        "responses": {
+          "204": {
+            "description": "Mailbox deleted"
+          }
+        }
+      }
+    },
+
+    // Messages
+    "/users/{user}/mailboxes/{mailbox}/messages": {
+      "get": {
+        "tags": ["Messages"],
+        "summary": "List messages in mailbox",
+        "parameters": [
+          {"$ref": "#/parameters/userIdParam"},
+          {"$ref": "#/parameters/mailboxIdParam"},
+          {"$ref": "#/parameters/limitParam"},
+          {"$ref": "#/parameters/pageParam"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/MessageList"
+            }
+          }
+        }
+      }
+    },
+
+    "/users/{user}/messages/{message}": {
+      "get": {
+        "tags": ["Messages"],
+        "summary": "Get message details",
+        "parameters": [
+          {"$ref": "#/parameters/userIdParam"},
+          {"$ref": "#/parameters/messageIdParam"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Messages"],
+        "summary": "Delete message",
+        "parameters": [
+          {"$ref": "#/parameters/userIdParam"},
+          {"$ref": "#/parameters/messageIdParam"}
+        ],
+        "responses": {
+          "204": {
+            "description": "Message deleted"
+          }
+        }
+      }
+    },
+
+    // Addresses
+    "/users/{user}/addresses": {
+      "get": {
+        "tags": ["Addresses"],
+        "summary": "List user email addresses",
+        "parameters": [{"$ref": "#/parameters/userIdParam"}],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Address"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Addresses"],
+        "summary": "Add email address",
+        "parameters": [
+          {"$ref": "#/parameters/userIdParam"},
+          {
+            "name": "address",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AddressCreate"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Address added",
+            "schema": {
+              "$ref": "#/definitions/Address"
+            }
+          }
+        }
+      }
+    },
+
+    // Additional endpoints would follow the same pattern...
+    // Including: Filters, Autoreplies, DKIM, Domain settings, etc.
+  },
+  "definitions": {
+    "AuthRequest": {
+      "type": "object",
+      "properties": {
+        "username": {"type": "string"},
+        "password": {"type": "string"}
+      },
+      "required": ["username", "password"]
+    },
+    "AuthResponse": {
+      "type": "object",
+      "properties": {
+        "token": {"type": "string"},
+        "expires": {"type": "string", "format": "date-time"}
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "string"},
+        "username": {"type": "string"},
+        "name": {"type": "string"},
+        "created": {"type": "string", "format": "date-time"},
+        "quota": {"$ref": "#/definitions/Quota"}
+      }
+    },
+    // More definitions would follow...
+  },
+  "parameters": {
+    "userIdParam": {
+      "name": "user",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "User ID or email address"
+    },
+    "mailboxIdParam": {
+      "name": "mailbox",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "Mailbox ID or special use name"
+    },
+    "messageIdParam": {
+      "name": "message",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "Message ID"
+    },
+    "limitParam": {
+      "name": "limit",
+      "in": "query",
+      "type": "integer",
+      "default": 20,
+      "description": "Number of results to return"
+    },
+    "pageParam": {
+      "name": "page",
+      "in": "query",
+      "type": "integer",
+      "default": 1,
+      "description": "Page number"
+    }
+  }
+}
