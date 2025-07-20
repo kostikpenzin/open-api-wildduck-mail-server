@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WildDuck API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui.css" />
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin:0;
+            background: #fafafa;
+        }
+        .swagger-ui .topbar {
+            background-color: #2b5797;
+        }
+        .swagger-ui .info .title {
+            color: #2b5797;
+        }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            // Преобразуем OpenAPI 2.0 в 3.0 формат
+            const spec = {
+                "openapi": "3.0.3",
+                "info": {
+                    "title": "WildDuck API",
+                    "version": "1.0.0",
+                    "description": "Complete REST API for WildDuck Mail Server"
+                },
+                "servers": [
+                    {
+                        "url": "https://your-wildduck-server.com/api",
+                        "description": "Production server"
+                    }
+                ],
+                "components": {
+                    "securitySchemes": {
+                        "AccessTokenAuth": {
+                            "type": "apiKey",
+                            "in": "header",
+                            "name": "X-Access-Token",
+                            "description": "Access token for WildDuck API authentication"
+                        }
+                    },
+                    "schemas": {
+                        "SuccessResponse": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean",
+                                    "example": true
+                                }
+                            }
+                        },
+                        "ErrorResponse": {
+                            "type": "object",
+                            "properties": {
+                                "success": {
+                                    "type": "boolean",
+                                    "example": false
+                                },
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "AccessTokenAuth": []
+                    }
+                ]
+            };
+
+            // Загружаем paths из существующего файла
+            fetch('./open-api.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Объединяем спецификацию с загруженными путями
+                    spec.paths = data.paths;
+                    if (data.components && data.components.schemas) {
+                        spec.components.schemas = { ...spec.components.schemas, ...data.components.schemas };
+                    }
+                    
+                    // Инициализируем Swagger UI
+                    SwaggerUIBundle({
+                        url: null,
+                        spec: spec,
+                        dom_id: '#swagger-ui',
+                        deepLinking: true,
+                        presets: [
+                            SwaggerUIBundle.presets.apis,
+                            SwaggerUIStandalonePreset
+                        ],
+                        plugins: [
+                            SwaggerUIBundle.plugins.DownloadUrl
+                        ],
+                        layout: "StandaloneLayout",
+                        validatorUrl: null,
+                        tryItOutEnabled: true,
+                        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+                        onComplete: function() {
+                            console.log('WildDuck API documentation loaded successfully');
+                        },
+                        onFailure: function(err) {
+                            console.error('Failed to load API documentation:', err);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading OpenAPI spec:', error);
+                    // Fallback: показываем базовую спецификацию
+                    SwaggerUIBundle({
+                        url: './open-api.json',
+                        dom_id: '#swagger-ui',
+                        deepLinking: true,
+                        presets: [
+                            SwaggerUIBundle.presets.apis,
+                            SwaggerUIStandalonePreset
+                        ],
+                        plugins: [
+                            SwaggerUIBundle.plugins.DownloadUrl
+                        ],
+                        layout: "StandaloneLayout"
+                    });
+                });
+        };
+    </script>
+</body>
+</html>
