@@ -277,12 +277,3 @@ server {
 
 MIT License - см. файл [LICENSE](LICENSE) для деталей.
 
-## Поддержка
-
-- 📧 Email: support@your-domain.com
-- 💬 Issues: [GitHub Issues](https://github.com/your-repo/issues)
-- 📖 WildDuck Documentation: https://docs.wildduck.email/
-
----
-
-**Made with ❤️ for the WildDuck community**
